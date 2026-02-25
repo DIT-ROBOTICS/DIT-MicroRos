@@ -1,0 +1,35 @@
+name: eurobot-micro-ros
+
+services:
+  micro-ros:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        ROS_DISTRO: humble
+        USER_UID: ${USER_UID:-1001}
+        USER_GID: ${USER_GID:-1001}
+    image: &IMG_NAME eurobot-micro-ros:latest
+    container_name: eurobot-micro-ros
+    hostname: eurobot-micro-ros
+    command: &CMD_BUILD /bin/bash -c "source /opt/ros/humble/setup.bash && source ~/micro_ros_ws/install/setup.bash && colcon build && ros2 run micro_ros_agent micro_ros_agent serial -b 2000000 -D /dev/mission"
+    tty: true
+    network_mode: host
+    ipc: host
+    privileged: true
+    stop_grace_period: &STOP_GRACE_PERIOD 1s
+
+    volumes: &VOLUMES
+      - ../:/home/micro-ros/eurobot-micro-ros/
+      - /dev:/dev
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/share:/home/share
+      - /tmp/.X11-unix:/tmp/.X11-unix
+
+    working_dir: &WORKING_DIR
+      /home/micro-ros/eurobot-micro-ros
+
+    environment: &ENV
+      - RCUTILS_COLORIZED_OUTPUT=1
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
