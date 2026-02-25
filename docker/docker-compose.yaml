@@ -12,7 +12,7 @@ services:
     image: &IMG_NAME eurobot-micro-ros:latest
     container_name: eurobot-micro-ros
     hostname: eurobot-micro-ros
-    command: &CMD_BUILD /bin/bash -c "source /opt/ros/humble/setup.bash && source ~/micro_ros_ws/install/setup.bash && colcon build && ros2 run micro_ros_agent micro_ros_agent serial -b 2000000 -D /dev/mission"
+    command: &CMD_BUILD /bin/bash -c "source /opt/ros/humble/setup.bash && source ~/micro_ros_ws/install/setup.bash && colcon build && { ros2 run micro_ros_agent micro_ros_agent serial -b 115200 -D /dev/mission & ros2 run micro_ros_agent micro_ros_agent serial -b 2000000 -D /dev/chassis & wait; }"
     tty: true
     network_mode: host
     ipc: host
