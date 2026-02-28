@@ -33,7 +33,8 @@ The container runs on the host network, so all ROS 2 topics/services are directl
 │   ├── Dockerfile                  # ROS 2 Humble image with micro-ROS agent
 │   ├── docker-compose.yaml         # Service definition
 │   └── scripts/
-│       └── install_micro_ros.sh    # Builds micro_ros_setup & agent inside the image
+│       ├── install_micro_ros.sh    # Builds micro_ros_setup & agent inside the image
+│       └── start_agents.sh        # Launches agents in a tmux session
 └── README.md
 ```
 
@@ -56,10 +57,20 @@ docker compose up
 
 On startup the container:
 1. Sources ROS 2 Humble and the micro-ROS workspace.
-2. Runs `colcon build` to ensure packages are up to date.
-3. Launches two `micro_ros_agent` instances in parallel (one per serial device).
+2. Creates a **tmux** session (`micro-ros`) with two panes — one for each serial agent.
 
-### 3. Stop the agent
+### 3. View agent logs
+
+From another terminal, attach to the tmux session inside the running container:
+
+```bash
+docker exec -it eurobot-micro-ros tmux attach -t micro-ros
+```
+
+- **Switch panes**: `Ctrl-b` then arrow key ↑ / ↓
+- **Detach** (return to host shell, container keeps running): `Ctrl-b` then `d`
+
+### 4. Stop the agent
 
 ```bash
 docker compose down
